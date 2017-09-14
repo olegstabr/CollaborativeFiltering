@@ -11,6 +11,7 @@ def load_data(path='./data/ml-100k/u.data'):
         prefs[user][movieId] = float(rating)
     return prefs
 
+
 # Вычисление коэффициента Пирсона
 def pearson(x, y, common):
     n = len(common)
@@ -34,6 +35,16 @@ def pearson(x, y, common):
     return k
 
 
+def pearson_sys(x, y):
+    dict1 = {}
+    dict2 = {}
+    for item in x:
+        if item in y:
+            dict1[item] = x[item]
+            dict2[item] = y[item]
+    return pearsonr(list(dict1.values()), list(dict2.values()))
+
+
 # Реализация функции близости 1 (Коэффициент корреляции Пирсона)
 def sim_distance_1(prefs, person1, person2):
     # Получить список предметов, оцененных обоими
@@ -45,8 +56,22 @@ def sim_distance_1(prefs, person1, person2):
     # Если нет ни одной общей оценки, вернуть 0
     if len(common) == 0:
         return 0
-
     return pearson(prefs[str(person1)], prefs[str(person2)], common)
+
+
+# Реализация функции близости 1 (Коэффициент корреляции Пирсона)
+def sim_distance_pearson_sys(prefs, person1, person2):
+    # Получить список предметов, оцененных обоими
+    common = {}
+    for item in prefs[str(person1)]:
+        if item in prefs[str(person2)]:
+            common[item] = 1
+
+    # Если нет ни одной общей оценки, вернуть 0
+    if len(common) == 0:
+        return 0
+
+    return pearson_sys(prefs[str(person1)], prefs[str(person2)])
 
 
 # Реализация функции близости 2 (Коэффициент Жаккара)
@@ -85,15 +110,18 @@ def get_rating(prefs, person, object_id, similarity=sim_distance_1):
         object_rating = prefs[str(person)][str(object_id)]
         print object_rating
     else:
-        print "Doesn't exist"
+        print ""
+
 
 
 def main():
     prefs = load_data()
-    print('Пирсон = %s' % sim_distance_1(prefs, 255, 144))
-    print('Жаккар = %s' % sim_distance_2(prefs, 255, 144))
-    print('Топ-5 Пирсон = %s' % topMatches(prefs, 255))
-    print('Топ-5 Жаккар = %s' % topMatches(prefs, 255, similarity=sim_distance_2))
+    print('Пирсон мой       = %s' % sim_distance_1(prefs, 255, 144))
+    print('Пирсон системный = %s' % sim_distance_pearson_sys(prefs, 255, 144)[0])
+    print('Жаккар           = %s' % sim_distance_2(prefs, 255, 144))
+    print('Топ-5 Пирсон     = %s' % topMatches(prefs, 255))
+    print('Топ-5 Жаккар     = %s' % topMatches(prefs, 255, similarity=sim_distance_2))
     get_rating(prefs, 255, 1)
+
 
 main()
