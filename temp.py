@@ -3,12 +3,13 @@ from scipy.stats.stats import pearsonr
 
 
 # Загрузка данных из файла
-def load_data(path='./data/ml-100k/u.data'):
+def load_data(path='./data/ml-100k/u1.base'):
     prefs = {}
-    for line in open(path):
-        (user, movieId, rating, timestamp) = line.split("\t")
-        prefs.setdefault(user, {})
-        prefs[user][movieId] = float(rating)
+    with open(path) as file:
+        for line in file:
+            (user, movieId, rating, timestamp) = line.split("\t")
+            prefs.setdefault(user, {})
+            prefs[user][movieId] = float(rating)
     return prefs
 
 
@@ -35,6 +36,24 @@ def pearson(x, y, common):
     return k
 
 
+def pearson2(x, y, common):
+    n = len(common)
+    # Простые суммы
+    sumX = sum([float(x[i]) for i in common])
+    sumY = sum([float(y[i]) for i in common])
+    # Среднее по x и y
+    averageX = float(sumX / n)
+    averageY = float(sumY / n)
+    # Сумма числителя
+    num = sum([(float(x[i]) - averageX) * (float(y[i]) - averageY) for i in common])
+    den = (sum([pow((float(x[i]) - averageX), 2) for i in common]) * sum(
+        [pow(float(y[i]) - averageY, 2) for i in common])) ** .5
+    if den == 0:
+        return 0
+    k = num / den
+    return k
+
+
 def pearson_sys(x, y):
     dict1 = {}
     dict2 = {}
@@ -42,7 +61,7 @@ def pearson_sys(x, y):
         if item in y:
             dict1[item] = x[item]
             dict2[item] = y[item]
-    return pearsonr(list(dict1.values()), list(dict2.values()))
+    return pearsonr(dict1.values(), dict2.values())[0]
 
 
 # Реализация функции близости 1 (Коэффициент корреляции Пирсона)
@@ -56,7 +75,7 @@ def sim_distance_1(prefs, person1, person2):
     # Если нет ни одной общей оценки, вернуть 0
     if len(common) == 0:
         return 0
-    return pearson(prefs[str(person1)], prefs[str(person2)], common)
+    return pearson2(prefs[str(person1)], prefs[str(person2)], common)
 
 
 # Реализация функции близости 1 (Коэффициент корреляции Пирсона)
@@ -92,7 +111,7 @@ def sim_distance_2(prefs, person1, person2):
 
 
 # Возвращает отранжированных k пользователей
-def topMatches(prefs, person, k=5, similarity=sim_distance_1):
+def top_matches(prefs, person, k=5, similarity=sim_distance_1):
     scores = [(similarity(prefs, person, int(other)), other)
               for other in prefs if int(other) != person]
     scores.sort()
@@ -105,23 +124,45 @@ def get_rating(prefs, person, object_id, similarity=sim_distance_1):
     # Посчитать меру близости пользователя со всеми остальными (кроме себя самого)
     # С помощью topMatches найти k самых похожих пользователя
     # Вычислить оценку для объекта object_id
-    simmilar = topMatches(prefs, person)
-    if str(object_id) in prefs[str(person)]:
-        object_rating = prefs[str(person)][str(object_id)]
-        print object_rating
-    else:
-        print ""
+    matches = top_matches(prefs, person, similarity=similarity)
+    sim = {}
+    for item in matches:
+        values = prefs[item[1]]
+        sim[item[1]] = values
 
+    num = sum([float(sim[item[1]][str(object_id)]) * item[0]
+               for item in matches if str(object_id) in sim[item[1]].keys()])
+    den = sum([item[0] for item in matches])
+    if den == 0:
+        return 0
+    rating = num / den
+    return rating
+
+
+def get_rating_for_user():
+    pass
 
 
 def main():
     prefs = load_data()
-    print('Пирсон мой       = %s' % sim_distance_1(prefs, 255, 144))
-    print('Пирсон системный = %s' % sim_distance_pearson_sys(prefs, 255, 144)[0])
-    print('Жаккар           = %s' % sim_distance_2(prefs, 255, 144))
-    print('Топ-5 Пирсон     = %s' % topMatches(prefs, 255))
-    print('Топ-5 Жаккар     = %s' % topMatches(prefs, 255, similarity=sim_distance_2))
-    get_rating(prefs, 255, 1)
+    print('Пирсон мой      user1=1 user2=120  = %s' % sim_distance_1(prefs, 1, 120))
+    print('Пирсон из библ. user1=1 user2=120  = %s' % sim_distance_pearson_sys(prefs, 1, 120))
+    print('Жаккар          user1=1 user2=120  = %s' % sim_distance_2(prefs, 1, 120))
+    print('Топ-5 Пирсон     = %s' % top_matches(prefs, 1))
+    print('Топ-5 Жаккар     = %s' % top_matches(prefs, 1, similarity=sim_distance_2))
+    # print
+    # dict1 = {}
+    # dict2 = {}
+    # for item in prefs[str(1)]:
+    #     if item in prefs[str(120)]:
+    #         dict1[item] = prefs[str(1)][item]
+    #         dict2[item] = prefs[str(120)][item]
+    # print('1 оценки = %s' % dict1)
+    # print('120 оценки = %s' % dict2)
+    print
+    print('Пирсон: Фильм id = %s | Спрогнозированная оценка = %f' % (742, get_rating(prefs, 1, 742)))
+    print('Жаккар: Фильм id = %s | Спрогнозированная оценка = %f' % (
+        742, get_rating(prefs, 1, 742, similarity=sim_distance_2)))
 
 
 main()
