@@ -127,8 +127,9 @@ def get_rating(prefs, person, object_id, similarity=sim_distance_1):
     matches = top_matches(prefs, person, similarity=similarity)
     sim = {}
     for item in matches:
-        values = prefs[item[1]]
-        sim[item[1]] = values
+        user_id = item[1]
+        values = prefs[user_id]
+        sim[user_id] = values
 
     num = sum([float(sim[item[1]][str(object_id)]) * item[0]
                for item in matches if str(object_id) in sim[item[1]].keys()])
@@ -165,4 +166,4 @@ def main():
         742, get_rating(prefs, 1, 742, similarity=sim_distance_2)))
 
 
-main()
+# main()
