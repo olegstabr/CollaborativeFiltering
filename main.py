@@ -17,18 +17,18 @@ def load_data(path='./data/ml-100k/u1.base'):
 def pearson(x, y, common):
     n = len(common)
     # Простые суммы
-    sumX = sum([float(x[i]) for i in common])
-    sumY = sum([float(y[i]) for i in common])
+    sum_x = sum([float(x[i]) for i in common])
+    sum_y = sum([float(y[i]) for i in common])
 
     # Суммы квадратов
-    sumXSq = sum([x[i] ** 2 for i in common])
-    sumYSq = sum([y[i] ** 2 for i in common])
+    sum_x_sq = sum([x[i] ** 2 for i in common])
+    sum_y_sq = sum([y[i] ** 2 for i in common])
     # Сумма проивзедений
-    pSum = sum([x[i] * y[i] for i in common])
+    p_sum = sum([x[i] * y[i] for i in common])
 
     # Коэффициент корреляции Пирсона
-    num = pSum - sumX * sumY / n
-    den = ((sumXSq - pow(sumX, 2) / n) * (sumYSq - pow(sumY, 2) / n)) ** .5
+    num = p_sum - sum_x * sum_y / n
+    den = ((sum_x_sq - pow(sum_x, 2) / n) * (sum_y_sq - pow(sum_y, 2) / n)) ** .5
 
     if den == 0:
         return 0
@@ -39,15 +39,15 @@ def pearson(x, y, common):
 def pearson2(x, y, common):
     n = len(common)
     # Простые суммы
-    sumX = sum([float(x[i]) for i in common])
-    sumY = sum([float(y[i]) for i in common])
+    sum_x = sum([float(x[i]) for i in common])
+    sum_y = sum([float(y[i]) for i in common])
     # Среднее по x и y
-    averageX = float(sumX / n)
-    averageY = float(sumY / n)
+    average_x = float(sum_x / n)
+    average_y = float(sum_y / n)
     # Сумма числителя
-    num = sum([(float(x[i]) - averageX) * (float(y[i]) - averageY) for i in common])
-    den = (sum([pow((float(x[i]) - averageX), 2) for i in common]) * sum(
-        [pow(float(y[i]) - averageY, 2) for i in common])) ** .5
+    num = sum([(float(x[i]) - average_x) * (float(y[i]) - average_y) for i in common])
+    den = (sum([pow((float(x[i]) - average_x), 2) for i in common]) * sum(
+        [pow(float(y[i]) - average_y, 2) for i in common])) ** .5
     if den == 0:
         return 0
     k = num / den
