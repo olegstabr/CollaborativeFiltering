@@ -28,13 +28,15 @@ def test_data(path='./data/ml-100k/u1.test'):
             test_data[user][movieId] = float(rating)
     ratings = test_data[user_id]
     for movie_id in ratings:
-        real_rating = test_data[user_id][movie_id]
-        real_ratings.append(real_rating)
         calc_rating = main.get_rating(base_data, user_id, int(movie_id))
-        calc_ratings.append(calc_rating)
         if calc_rating == 0:
             continue
-    print calculate_error(real_ratings, calc_ratings)
+        calc_ratings.append(calc_rating)
+        real_rating = test_data[user_id][movie_id]
+        real_ratings.append(real_rating)
+    print("Реальные оценки:      %s" % real_ratings)
+    print("Предсказанные оценки: %s" % calc_ratings)
+    print("Ошибка: %s" % calculate_error(real_ratings, calc_ratings))
         # print('Фильм = %s\nРеальная оценка = %f\nПосчитанная оценка = %f\nОшибка = %f\n' % (
         #     movie_id, real_rating, calc_rating, calculate_error(real_rating, calc_rating)))
 
