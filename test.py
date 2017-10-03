@@ -49,6 +49,7 @@ def test_data(path='./data/ml-100k/u1.test', load_data=user_based.load_data):
 
 
 def test():
+    user_based.visualize_R(user_based.load_data())
     test_data()
     test_data(load_data=item_based.load_data)
 

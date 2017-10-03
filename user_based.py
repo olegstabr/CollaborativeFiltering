@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from scipy.stats.stats import pearsonr
-
+import matplotlib.pyplot as plt
 
 # Загрузка данных из файла
 def load_data(path='./data/ml-100k/u1.base'):
@@ -11,6 +11,21 @@ def load_data(path='./data/ml-100k/u1.base'):
             prefs.setdefault(user, {})
             prefs[user][movieId] = float(rating)
     return prefs
+
+
+# Визуализация матрицы R
+def visualize_R(prefs):
+    # реализуйте визуализацию с помощью matplotlib
+    x = []
+    y = []
+    for user in prefs:
+        for movie in prefs[user]:
+            x.append(int(user))
+            y.append(int(movie))
+    plt.plot(x, y, 'b,')
+    plt.ylabel('movie_id')
+    plt.xlabel('user_id')
+    plt.show()
 
 
 # Вычисление коэффициента Пирсона
