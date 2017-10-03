@@ -140,10 +140,6 @@ def get_rating(prefs, person, object_id, similarity=sim_distance_1):
     return rating
 
 
-def get_rating_for_user():
-    pass
-
-
 def main():
     prefs = load_data()
     print('Пирсон мой      user1=1 user2=120  = %s' % sim_distance_1(prefs, 1, 120))
