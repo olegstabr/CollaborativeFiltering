@@ -43,7 +43,7 @@ def sim_distance_2(prefs, person1, person2):
 
 
 # Возвращает отранжированных k пользователей
-def topMatches(prefs, person, k=5, similarity=sim_distance):
+def topMatches(prefs, person, k=5, similarity=sim_distance_1):
     scores = [(similarity(prefs, person, other), other)
               for other in prefs if other != person]
     scores.sort()
@@ -52,7 +52,7 @@ def topMatches(prefs, person, k=5, similarity=sim_distance):
 
 
 # Получить неизвестную оценку объекта для пользователя
-def get_rating(prefs, person, object_id, similarity=sim_distance):
+def get_rating(prefs, person, object_id, similarity=sim_distance_1):
     # Посчитать меру близости пользователя со всеми остальными (кроме себя самого)
     # С помощью topMatches найти k самых похожих пользователя
     # Вычислить оценку для объекта object_id
